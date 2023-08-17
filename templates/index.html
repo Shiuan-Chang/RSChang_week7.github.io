@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="/public/indexstyle.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="utf-8">
+</head>
+
+
+<body>
+  <header class="topbar">
+    <span>歡迎光臨，請註冊登入系統</span>
+  </header>
+  <section class="form">
+    <form action="{{ url_for('signup') }}" method="POST" onsubmit="return register()">
+      <span class="sign_text">註冊系統</span>
+      <div class="info1">
+        <span style="margin-top: 8px;">姓名</span>
+        <input class="box1" type="text" name="name1" />
+      </div>
+      <div class="info1">
+        <span style="margin-top: 8px;">帳號</span>
+        <input class="box1" type="text" name="account1" />
+      </div>
+      <div class="info2">
+        <span style="margin-top: 8px;">密碼</span>
+        <input class="box2" type="password" name="password1" />
+      </div>
+      </span>
+      <div class="button">
+        <button type="submit">註冊</button>
+      </div>
+    </form>
+    <hr>
+    <form action="{{ url_for('signin') }}" method="POST" onsubmit="return login()" style="margin-top: 30px;">
+      <span class="sign_text">登入系統</span>
+      <div class="info1">
+        <span style="margin-top: 8px;">帳號</span>
+        <input class="box1" type="text" name="account2" />
+      </div>
+      <div class="info2">
+        <span style="margin-top: 8px;">密碼</span>
+        <input class="box2" type="password" name="password2" />
+      </div>
+      <div class="button">
+        <button type="submit">登入</button>
+      </div>
+      </div>
+    </form>
+    <script>
+      function register() {
+        let name = document.querySelector('input[name="name1"]');
+        let account = document.querySelector('input[name="account1"]');
+        let password = document.querySelector('input[name="password1"]');
+        if (!name.value || !account.value || !password.value) {
+          alert("請輸入姓名、帳號及密碼");
+          event.preventDefault();
+          return false; //防止表單送出
+        }
+        return true;
+      }
+      function login() {
+        let username = document.querySelector('input[name="account2"]');
+        let password = document.querySelector('input[name="password2"]');
+        if (!username.value || !password.value) {
+          alert("請輸入帳號密碼");
+          return false;
+        }
+        return true;
+      }
+    </script>
+  </section>
+</body>
+
+</html>

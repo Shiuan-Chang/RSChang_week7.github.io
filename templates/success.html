@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="utf-8">
+  <link rel="stylesheet" href="/public/success.css">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+</head>
+
+<body>
+  <header class="topbar">
+    <span>歡迎光臨，這是會員頁</span>
+  </header>
+  <section class="form">
+    <span name="display_name">{{name}}，歡迎登入系統</span>
+    <a href="/signout"> 登出系統</a>
+    <div class="title_find">查詢會員姓名</div>
+    <div class="input_find">
+      <input class="username_find_box" name="username_find" />
+      <button class="find_button">查詢</button>
+    </div>
+    <div class="username_show"></div>
+    <div class="title_renew">更新我的姓名</div>
+    <div class="input_renew">
+      <input class="name_renew_box" />
+      <button class="renew_button">更新</button>
+    </div>
+    <div class="renew_status"></div>
+  </section>
+  <hr>
+  <section class="form" style="margin-top: 30px;">
+    <form action="{{ url_for('createMessage') }}" method="POST">
+      <span style="text-align: center; display: block;">快來留言吧</span>
+      <div class="content">
+        <span style="margin-top: 8px;">內容</span>
+        <input class="box1" type="text" name="message" />
+      </div>
+      <div class="button">
+        <button type="submit">送出</button>
+      </div>
+    </form>
+  </section>
+  <hr>
+  <section class="form" style="margin-top: 30px; color: black;">
+    <ul>
+      {% for message in messages %}
+      <p class="message" data-id="{{message[2]}}">
+        {{ message[0] }}: {{ message[1] }}
+        <!-- 如果留言的作者是當前登入的用戶,name在flask鐘用session儲存 -->
+        {% if message[0]==name %}
+        <button class="delete-btn" data-id="{{message[2]}}">X</button>
+        {% endif %}
+      </p>
+      {% endfor %}
+    </ul>
+  </section>
+  <input type="hidden" id="currentUsername" value="{{ session['username'] }}">
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      function bindDeleteEvents() {
+        let deleteBtns = document.getElementsByClassName('delete-btn');
+        // 使用Array.from 將 HTMLCollection 轉換為陣列，以便使用 forEach(就是每個刪除的鈕)
+        Array.from(deleteBtns).forEach(btn => {
+          btn.addEventListener('click', function (e) {
+            e.preventDefault();// e 代表事件對象,也就是每個刪除按鈕的監聽器。prevent代表阻止預設情況，避免沒確認就直接送出結果
+
+            let Confirmed = confirm("確定要刪除這條留言嗎？");
+
+            if (Confirmed) {
+              let messageId = e.target.getAttribute('data-id');
+
+              // AJAX 請求到後端端點
+              fetch(`/deleteMessage`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: messageId })
+              })
+                .then(response => {
+                  if (response.ok) {
+                    location.reload();// 如果返回 200 OK，重新載入頁面
+                  } else {
+                    console.error('Failed to delete message');
+                  }
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                });
+            }
+          });
+        });
+      }
+      bindDeleteEvents();
+      function getCurrentUserName() {
+        const currentUsername = document.getElementById('currentUsername').value;
+        fetch(`http://127.0.0.1:3000/api/member?username=${currentUsername}`, { method: 'GET' })
+          .then(response => response.json())
+          .then(data => {
+            if (data.data && data.data.name) {
+              document.querySelector('span[name="display_name"]').innerText = data.data.name + "，歡迎登入系統";
+            }
+          });
+      }
+
+      getCurrentUserName();
+
+      let find_button = document.querySelector('.find_button');
+      let name_find_box = document.querySelector('.username_find_box');
+      let name_show = document.querySelector('.username_show');
+
+      find_button.addEventListener('click', function () {
+        let name_data = name_find_box.value;
+        if (!name_data || name_data.trim() === "") {
+          name_show.innerHTML = "查無資料";
+          return;  // 結束此函數
+        }
+        if (name_data) {
+          fetch(`http://127.0.0.1:3000/api/member?username=${name_data}`, { method: 'GET' })
+            .then(response => response.json())//前方的response是參數，後方是要回傳的資料
+            .then(data => {//前方的data是參數
+              if (!data.data) {//前方data是參數，後方是jason的"data"
+                name_show.innerHTML = "查無資料";
+              } else {
+                let member_data = data.data;
+                name_show.innerHTML = `<p>${member_data.name}</p>`;
+              }
+            })
+        }
+      })
+      let renew_button = document.querySelector('.renew_button');
+      let name_renew_box = document.querySelector('.name_renew_box');
+      let renew_status = document.querySelector('.renew_status');
+      renew_button.addEventListener('click', function () {
+
+        let renew_name_data = name_renew_box.value;
+        if (renew_name_data) {
+          fetch(`api/member`, {
+            method: "PATCH", headers: {
+              'Content-Type': 'application/json',
+            }, body: JSON.stringify({ name: renew_name_data })
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.ok) {
+                document.querySelector('.renew_status').innerText = "更新成功";
+                bindDeleteEvents();
+                let displayName = renew_name_data;
+                if (data.data && data.data.name) {
+                  displayName = data.data.name;
+                }
+                document.querySelector('span[name="display_name"]').innerText = displayName + "，歡迎登入系統";
+              }
+            })
+        }
+      })
+    })
+  </script>
+</body>
+
+</html>

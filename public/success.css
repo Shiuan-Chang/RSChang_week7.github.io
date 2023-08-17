@@ -1,0 +1,78 @@
+body {
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  font-size: 25px;
+  font-weight: bold;
+  background-color: #5599FF;
+  color: aliceblue;
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 20px;
+  color: #5599FF;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+}
+
+hr {
+  width: 100%;
+  border: none;
+  border-top: 2px solid #5599FF;
+  margin: 40px 0;
+}
+
+.title_find {
+  margin-top: 20px;
+}
+
+.input_find {
+  margin-top: 10px;
+}
+
+.name_show {
+  margin-top: 10px;
+}
+
+.title_renew {
+  margin-top: 20px;
+}
+
+.input_renew {
+  margin-top: 10px;
+}
+
+.renew_status {
+  margin-top: 10px;
+}
+
+
+.box1 {
+  margin-top: 8px;
+  margin-left: 8px;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
